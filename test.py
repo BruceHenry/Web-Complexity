@@ -7,6 +7,9 @@ from pprint import pprint
 with open('cnn_test.har', 'rb') as f:
     data = json.loads(f.read().decode("utf-8-sig"))
 
+distinctServer = 0
+host = []
+
 requestCount = 0
 
 cssCount = 0
@@ -102,6 +105,25 @@ for entry in data['log']['entries']:
         videoSize += entry['response']['content']['size']
         videoTime += entry['time']
 
+    if (entry['request']["headers"][0]['value'] not in host):
+        host.append(entry['request']["headers"][0]['value'])
+
+s = host[0]
+hostName = ""
+n = 1
+count = 0
+while count != 2:
+    c = s[len(s) - n]
+    hostName = c + hostName
+    if c != '.':
+        n += 1
+        continue
+    count += 1
+    n += 1
+hostName = hostName[1:len(hostName)]
+
+print("hostName:", hostName)
+print(host)
 print('requestCount:', requestCount)
 print('total size,time:', totalSize, totalTime)
 print('Image Count,size,time:', imageCount, imageSize, imageTime)

@@ -14,9 +14,9 @@ for data in answer:
 dirs = os.listdir("D://")
 pattern_har = re.compile(".*har")
 
-for i in range(len(dirs)):
-    if pattern_har.match(dirs[i]):
-        with open(dirs[i], 'rb') as f:
+for file in dirs:
+    if pattern_har.match(file):
+        with open(file, 'rb') as f:
             data = json.loads(f.read().decode("utf-8-sig"))
 
         distinctServer = 0

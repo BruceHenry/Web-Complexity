@@ -1,136 +1,127 @@
 import json
-
+import os
 import re
+import dns.resolver
 
-from pprint import pprint
+answer = dns.resolver.query("yahoo.com", "NS")
+for data in answer:
+    print(data)
+answer = dns.resolver.query("yimg.com", "NS")
+print()
+for data in answer:
+    print(data)
 
-with open('cnn_test.har', 'rb') as f:
-    data = json.loads(f.read().decode("utf-8-sig"))
+dirs = os.listdir("D://")
+pattern_har = re.compile(".*har")
 
-distinctServer = 0
-host = []
+for i in range(len(dirs)):
+    if pattern_har.match(dirs[i]):
+        with open(dirs[i], 'rb') as f:
+            data = json.loads(f.read().decode("utf-8-sig"))
 
-requestCount = 0
+        distinctServer = 0
+        host = []
 
-cssCount = 0
-imageCount = 0
-flashCount = 0
-jsCount = 0
-xmlCount = 0
-htmlCount = 0
-jsonCount = 0
-videoCount = 0
+        total = {"request": 0, "size": 0, "loadTime": 0}
+        css = {"object": 0, "size": 0, "loadTime": 0}
+        image = {"object": 0, "size": 0, "loadTime": 0}
+        flash = {"object": 0, "size": 0, "loadTime": 0}
+        javascript = {"object": 0, "size": 0, "loadTime": 0}
+        xml = {"object": 0, "size": 0, "loadTime": 0}
+        html = {"object": 0, "size": 0, "loadTime": 0}
+        Json = {"object": 0, "size": 0, "loadTime": 0}
+        video = {"object": 0, "size": 0, "loadTime": 0}
 
-totalSize = 0
-cssSize = 0
-imageSize = 0
-flashSize = 0
-jsSize = 0
-xmlSize = 0
-htmlSize = 0
-jsonSize = 0
-videoSize = 0
+        pattern_image = re.compile('image.*')
+        pattern_css = re.compile("text/css.*")
+        pattern_javascript = re.compile('text/.*javascript|application/.*script')
+        pattern_xml = re.compile('test/xml.*|application/xml.*')
+        pattern_html = re.compile('text/html.*')
+        pattern_json = re.compile('application/json.*|text/.*json')
+        pattern_video = re.compile('video.*')
+        pattern_response = re.compile("2.*")
 
-totalTime = 0
-cssTime = 0
-imageTime = 0
-flashTime = 0
-jsTime = 0
-xmlTime = 0
-htmlTime = 0
-jsonTime = 0
-videoTime = 0
+        total["request"] = len(data['log']['entries'])
 
-pattern_image = re.compile('image.*')
-pattern_css = re.compile("text/css.*")
-pattern_javascript = re.compile('text/.*javascript|application/.*script')
-pattern_xml = re.compile('test/xml.*|application/xml.*')
-pattern_html = re.compile('text/html.*')
-pattern_json = re.compile('application/json.*|text/.*json')
-pattern_video = re.compile('video.*')
-pattern_response = re.compile("2.*")
+        for entry in data['log']['entries']:
 
-requestCount = len(data['log']['entries'])
+            total["size"] += entry['response']['content']['size']
+            total["loadTime"] += entry['time']
 
-for entry in data['log']['entries']:
+            if (pattern_image.match(entry['response']['content']['mimeType']) and pattern_response.match(
+                    str(entry['response']['status']))):
+                image["object"] += 1
+                image["size"] += entry['response']['content']['size']
+                image["loadTime"] += entry['time']
 
-    totalSize += entry['response']['content']['size']
-    totalTime += entry['time']
+            if (pattern_css.match(entry['response']['content']['mimeType']) and pattern_response.match(
+                    str(entry['response']['status']))):
+                css["object"] += 1
+                css["size"] += entry['response']['content']['size']
+                css["loadTime"] += entry['time']
 
-    if (pattern_image.match(entry['response']['content']['mimeType']) and pattern_response.match(
-            str(entry['response']['status']))):
-        imageCount += 1
-        imageSize += entry['response']['content']['size']
-        imageTime += entry['time']
+            if (entry['response']['content']['mimeType'] == 'application/x-shockwave-flash' and pattern_response.match(
+                    str(entry['response']['status']))):
+                flash["object"] += 1
+                flash["size"] += entry['response']['content']['size']
+                flash["loadTime"] += entry['time']
 
-    if (pattern_css.match(entry['response']['content']['mimeType']) and pattern_response.match(
-            str(entry['response']['status']))):
-        cssCount += 1
-        cssSize += entry['response']['content']['size']
-        cssTime += entry['time']
+            if (pattern_javascript.match(entry['response']['content']['mimeType']) and pattern_response.match(
+                    str(entry['response']['status']))):
+                javascript["object"] += 1
+                javascript["size"] += entry['response']['content']['size']
+                javascript["loadTime"] += entry['time']
 
-    if (entry['response']['content']['mimeType'] == 'application/x-shockwave-flash' and pattern_response.match(
-            str(entry['response']['status']))):
-        flashCount += 1
-        flashSize += entry['response']['content']['size']
-        flashTime += entry['time']
+            if (pattern_xml.match(entry['response']['content']['mimeType']) and pattern_response.match(
+                    str(entry['response']['status']))):
+                xml["object"] += 1
+                xml["size"] += entry['response']['content']['size']
+                xml["loadTime"] += entry['time']
 
-    if (pattern_javascript.match(entry['response']['content']['mimeType']) and pattern_response.match(
-            str(entry['response']['status']))):
-        jsCount += 1
-        jsSize += entry['response']['content']['size']
-        jsTime += entry['time']
+            if (pattern_html.match(entry['response']['content']['mimeType']) and pattern_response.match(
+                    str(entry['response']['status']))):
+                html["object"] += 1
+                html["size"] += entry['response']['content']['size']
+                html["loadTime"] += entry['time']
 
-    if (pattern_xml.match(entry['response']['content']['mimeType']) and pattern_response.match(
-            str(entry['response']['status']))):
-        xmlCount += 1
-        xmlSize += entry['response']['content']['size']
-        xmlTime += entry['time']
+            if (pattern_json.match(entry['response']['content']['mimeType']) and pattern_response.match(
+                    str(entry['response']['status']))):
+                Json["object"] += 1
+                Json["size"] += entry['response']['content']['size']
+                Json["loadTime"] += entry['time']
 
-    if (pattern_html.match(entry['response']['content']['mimeType']) and pattern_response.match(
-            str(entry['response']['status']))):
-        htmlCount += 1
-        htmlSize += entry['response']['content']['size']
-        htmlTime += entry['time']
+            if (pattern_video.match(entry['response']['content']['mimeType']) and pattern_response.match(
+                    str(entry['response']['status']))):
+                video["object"] += 1
+                video["size"] += entry['response']['content']['size']
+                video["loadTime"] += entry['time']
 
-    if (pattern_json.match(entry['response']['content']['mimeType']) and pattern_response.match(
-            str(entry['response']['status']))):
-        jsonCount += 1
-        jsonSize += entry['response']['content']['size']
-        jsonTime += entry['time']
+            if entry['request']["headers"][0]['value'] not in host:
+                host.append(entry['request']["headers"][0]['value'])
 
-    if (pattern_video.match(entry['response']['content']['mimeType']) and pattern_response.match(
-            str(entry['response']['status']))):
-        videoCount += 1
-        videoSize += entry['response']['content']['size']
-        videoTime += entry['time']
+        s = host[0]
+        hostName = ""
+        n = 1
+        count = 0
+        while count != 2:
+            c = s[len(s) - n]
+            hostName = c + hostName
+            if c != '.':
+                n += 1
+                continue
+            count += 1
+            n += 1
+        hostName = hostName[1:len(hostName)]
 
-    if (entry['request']["headers"][0]['value'] not in host):
-        host.append(entry['request']["headers"][0]['value'])
-
-s = host[0]
-hostName = ""
-n = 1
-count = 0
-while count != 2:
-    c = s[len(s) - n]
-    hostName = c + hostName
-    if c != '.':
-        n += 1
-        continue
-    count += 1
-    n += 1
-hostName = hostName[1:len(hostName)]
-
-print("hostName:", hostName)
-print(host)
-print('requestCount:', requestCount)
-print('total size,time:', totalSize, totalTime)
-print('Image Count,size,time:', imageCount, imageSize, imageTime)
-print('css Count,size,time:', cssCount, cssSize, cssTime)
-print('flash Count,size,time:', flashCount, flashSize, flashTime)
-print('js Count,size,time:', jsCount, jsSize, jsTime)
-print('xml Count,size,time:', xmlCount, xmlSize, xmlTime)
-print('html Count,size,time:', htmlCount, htmlSize, htmlTime)
-print('json Count,size,time:', jsonCount, jsonSize, jsonTime)
-print('video Count,size,time:', videoCount, videoSize, videoTime)
+        print()
+        print("hostName:", hostName)
+        print("servers:",host)
+        print('total:', total)
+        print('image:', image)
+        print('css:', css)
+        print('flash:', flash)
+        print('javascript:', javascript)
+        print('xml:', xml)
+        print('html:', html)
+        print('json:', Json)
+        print('video:', video)

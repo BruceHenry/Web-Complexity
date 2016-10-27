@@ -13,14 +13,6 @@ def get_host(url):
         s = s[len(s) - 2] + '.' + s[len(s) - 1]
     return s
 
-answer = dns.resolver.query("yahoo.com", "NS")
-for data in answer:
-    print(data)
-answer = dns.resolver.query("yimg.com", "NS")
-print()
-for data in answer:
-    print(data)
-
 dirs = os.listdir("D://")
 pattern_har = re.compile(".*har")
 
@@ -29,8 +21,13 @@ for file in dirs:
         with open(file, 'rb') as f:
             data = json.loads(f.read().decode("utf-8-sig"))
 
-        distinctServer = 0
         host = []
+        host.append(data['log']['entries'][0]['request']["headers"][0]['value'])
+        nameServers = []
+        answer = dns.resolver.query(get_host(host[0]), "NS")
+        for nameServer in answer:
+            nameServers.append(str(nameServer)[:len(str(nameServer)) - 1])
+        print(nameServers)
 
         total = {"request": 0, "size": 0, "loadTime": 0}
         css = {"object": 0, "size": 0, "loadTime": 0}
@@ -41,6 +38,8 @@ for file in dirs:
         html = {"object": 0, "size": 0, "loadTime": 0}
         Json = {"object": 0, "size": 0, "loadTime": 0}
         video = {"object": 0, "size": 0, "loadTime": 0}
+        originNumber = 1
+        non_origin = {"object": 0, "size": 0, "loadTime": 0}
 
         pattern_image = re.compile('image.*')
         pattern_css = re.compile("text/css.*")
@@ -106,11 +105,24 @@ for file in dirs:
                 video["size"] += entry['response']['content']['size']
                 video["loadTime"] += entry['time']
 
+            find_flag = 0
             if entry['request']["headers"][0]['value'] not in host:
                 host.append(entry['request']["headers"][0]['value'])
+                answer = dns.resolver.query(get_host(host[len(host) - 1]), "NS")
+                for ns in answer:
+                    if str(ns) in nameServers:
+                        originNumber += 1
+                        find_flag = 1
+                        break
+                if find_flag == 0:
+                    non_origin["object"] += 1
+                    non_origin["size"] += entry['response']['content']['size']
+                    non_origin["loadTime"] += entry['time']
 
-        print()
         print("hostName:", get_host(host[0]))
+        print("Number of servers:", len(host))
+        print("originNumber:", originNumber)
+        print("non_origin:", non_origin)
         print("servers:", host)
         print('total:', total)
         print('image:', image)
@@ -121,3 +133,4 @@ for file in dirs:
         print('html:', html)
         print('json:', Json)
         print('video:', video)
+        print()

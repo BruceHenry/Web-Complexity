@@ -110,9 +110,9 @@ for file in dirs:
                 host.append(entry['request']["headers"][0]['value'])
                 answer = dns.resolver.query(get_host(host[len(host) - 1]), "NS")
                 for ns in answer:
-                    if str(ns) in nameServers:
+                    if str(ns)[:len(str(ns))-1] in nameServers:
                         originNumber += 1
-                        find_flag = 1
+                        find_flag = 10
                         break
                 if find_flag == 0:
                     non_origin["object"] += 1

@@ -3,6 +3,16 @@ import os
 import re
 import dns.resolver
 
+
+def get_host(url):
+    pattern_dns = re.compile('co|edu|com')
+    s = url.split('.')
+    if pattern_dns.match(s[len(s) - 2]):
+        s = s[len(s) - 3] + '.' + s[len(s) - 2] + '.' + s[len(s) - 1]
+    else:
+        s = s[len(s) - 2] + '.' + s[len(s) - 1]
+    return s
+
 answer = dns.resolver.query("yahoo.com", "NS")
 for data in answer:
     print(data)
@@ -99,23 +109,9 @@ for file in dirs:
             if entry['request']["headers"][0]['value'] not in host:
                 host.append(entry['request']["headers"][0]['value'])
 
-        s = host[0]
-        hostName = ""
-        n = 1
-        count = 0
-        while count != 2:
-            c = s[len(s) - n]
-            hostName = c + hostName
-            if c != '.':
-                n += 1
-                continue
-            count += 1
-            n += 1
-        hostName = hostName[1:len(hostName)]
-
         print()
-        print("hostName:", hostName)
-        print("servers:",host)
+        print("hostName:", get_host(host[0]))
+        print("servers:", host)
         print('total:', total)
         print('image:', image)
         print('css:', css)

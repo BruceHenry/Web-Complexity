@@ -5,19 +5,26 @@ import dns.resolver
 
 
 def get_host(url):
-    pattern_dns = re.compile('co|edu|com')
+    pattern_dns = re.compile('co\0|edu\0|com\0')
     s = url.split('.')
+    if len(s) < 3:
+        s = s[len(s) - 2] + '.' + s[len(s) - 1]
+        return s
     if pattern_dns.match(s[len(s) - 2]):
         s = s[len(s) - 3] + '.' + s[len(s) - 2] + '.' + s[len(s) - 1]
     else:
         s = s[len(s) - 2] + '.' + s[len(s) - 1]
     return s
 
-dirs = os.listdir("D://")
-pattern_har = re.compile(".*har")
 
+path = "D:/harsample/untitled folder/"
+dirs = os.listdir(path)
+pattern_har = re.compile(".*.har")
+i = 1
 for file in dirs:
     if pattern_har.match(file):
+        print(file)
+        file = path + file
         with open(file, 'rb') as f:
             data = json.loads(f.read().decode("utf-8-sig"))
 
@@ -106,18 +113,22 @@ for file in dirs:
                 video["loadTime"] += entry['time']
 
             find_flag = 0
-            if entry['request']["headers"][0]['value'] not in host:
-                host.append(entry['request']["headers"][0]['value'])
-                answer = dns.resolver.query(get_host(host[len(host) - 1]), "NS")
-                for ns in answer:
-                    if str(ns)[:len(str(ns))-1] in nameServers:
-                        originNumber += 1
-                        find_flag = 10
-                        break
-                if find_flag == 0:
-                    non_origin["object"] += 1
-                    non_origin["size"] += entry['response']['content']['size']
-                    non_origin["loadTime"] += entry['time']
+
+            try:
+                if entry['request']["headers"][0]['value'] not in host:
+                    host.append(entry['request']["headers"][0]['value'])
+                    answer = dns.resolver.query(get_host(host[len(host) - 1]), "NS")
+                    for ns in answer:
+                        if str(ns)[:len(str(ns)) - 1] in nameServers:
+                            originNumber += 1
+                            find_flag = 1
+                            break
+                    if find_flag == 0:
+                        non_origin["object"] += 1
+                        non_origin["size"] += entry['response']['content']['size']
+                        non_origin["loadTime"] += entry['time']
+            except:
+                pass
 
         print("hostName:", get_host(host[0]))
         print("Number of servers:", len(host))
@@ -133,4 +144,6 @@ for file in dirs:
         print('html:', html)
         print('json:', Json)
         print('video:', video)
+        print(i)
+        i += 1
         print()

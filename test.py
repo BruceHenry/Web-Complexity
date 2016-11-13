@@ -16,20 +16,25 @@ def get_host(url):
         s = s[len(s) - 2] + '.' + s[len(s) - 1]
     return s
 
-
 path = "D:/harsample/untitled folder/"
 dirs = os.listdir(path)
 pattern_har = re.compile(".*.har")
 i = 1
 for file in dirs:
     if pattern_har.match(file):
-        print(file)
         file = path + file
         with open(file, 'rb') as f:
-            data = json.loads(f.read().decode("utf-8-sig"))
+            try:
+                data = json.loads(f.read().decode("utf-8-sig"))
+            except:
+                continue
+        print(file)
 
         host = []
-        host.append(data['log']['entries'][0]['request']["headers"][0]['value'])
+        try:
+            host.append(data['log']['entries'][0]['request']["headers"][0]['value'])
+        except:
+            continue
         nameServers = []
         answer = dns.resolver.query(get_host(host[0]), "NS")
         for nameServer in answer:

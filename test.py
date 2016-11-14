@@ -2,6 +2,7 @@ import json
 import os
 import re
 import dns.resolver
+import csv
 
 
 def get_host(url):
@@ -20,6 +21,11 @@ path = "D:/harsample/untitled folder/"
 dirs = os.listdir(path)
 pattern_har = re.compile(".*.har")
 i = 1
+
+rank_dict={}
+with open("ranklist") as tsvfile:
+    tsvreader = csv.reader(tsvfile, delimiter="\t")
+
 for file in dirs:
     if pattern_har.match(file):
         file = path + file

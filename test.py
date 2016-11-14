@@ -16,7 +16,13 @@ def get_host(url):
         s = s[len(s) - 2] + '.' + s[len(s) - 1]
     return s
 
-path = "D:/harsample/untitled folder/"
+rankmap = {}
+rank1to400 = []
+with open('random_2000_gold.txt','r') as f:
+    for line in f.read().splitlines():
+        rankmap[line.split('\t')[1]] = int(line.split('\t')[0])
+
+path = "har/untitled folder/"
 dirs = os.listdir(path)
 pattern_har = re.compile(".*.har")
 i = 1
@@ -61,6 +67,7 @@ for file in dirs:
         pattern_json = re.compile('application/json.*|text/.*json')
         pattern_video = re.compile('video.*')
         pattern_response = re.compile("2.*")
+
 
         total["request"] = len(data['log']['entries'])
 
@@ -135,20 +142,36 @@ for file in dirs:
             except:
                 pass
 
-        print("hostName:", get_host(host[0]))
-        print("Number of servers:", len(host))
-        print("originNumber:", originNumber)
-        print("non_origin:", non_origin)
-        print("servers:", host)
-        print('total:', total)
-        print('image:', image)
-        print('css:', css)
-        print('flash:', flash)
-        print('javascript:', javascript)
-        print('xml:', xml)
-        print('html:', html)
-        print('json:', Json)
-        print('video:', video)
-        print(i)
-        i += 1
-        print()
+        # number of sites with <= numObjects
+        #---------------------
+        # total number of sites
+
+
+        host = os.path.basename(file)[:os.path.basename(file).find('+')].replace('www.','').replace('ww1.','')
+        if host in rankmap:
+            print("hostName:", host)
+            print("Rank:", rankmap[host])
+            print("Number of servers:", len(host))
+            print("originNumber:", originNumber)
+            print("non_origin:", non_origin)
+            print("servers:", host)
+            print('total:', total)
+            print('image:', image)
+            print('css:', css)
+            print('flash:', flash)
+            print('javascript:', javascript)
+            print('xml:', xml)
+            print('html:', html)
+            print('json:', Json)
+            print('video:', video)
+
+            if int(rankmap[host]) >= 10000 and int(rankmap[host]) <= 20000:
+                print "HEREE"
+                print total
+                rank1to400.append(len(host))
+
+            print(i)
+            i += 1
+            print()
+
+print rank1to400

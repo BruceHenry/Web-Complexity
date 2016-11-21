@@ -2,6 +2,7 @@ import json
 import os
 import re
 import dns.resolver
+import graph_2
 import csv
 
 
@@ -18,7 +19,7 @@ def get_host(url):
     return s
 
 
-path = "D:/harsample/untitled folder/"
+path = "/home/kartik/Documents/untitled folder/"
 dirs = os.listdir(path)
 pattern_har = re.compile(".*.har")
 i = 1
@@ -33,6 +34,7 @@ with open("ranklist") as tsvfile:
             continue
 
 serverCache = {}
+row_values=[]
 rank_spread = {"1-400": {}, "400-1000": {}, "1000-2500": {}, "5000-10000": {}, "10000-20000": {}}
 for file in dirs:
     if pattern_har.match(file):
@@ -87,6 +89,7 @@ for file in dirs:
         pattern_response = re.compile("2.*")
 
         total["request"] = len(data['log']['entries'])
+
 
         for entry in data['log']['entries']:
 
@@ -246,8 +249,7 @@ for file in dirs:
             else:
                 rank_spread["10000-20000"][host[0]] += 1
 
-        row_values = [rank, cat,
-                      "object:", image["object"], javascript["object"], css["object"], flash["object"], xml["object"],
+        row_values.append([rank, cat, image["object"], javascript["object"], css["object"], flash["object"], xml["object"],
                       html["object"], Json["object"], video["object"],
                       "size:", image["size"], javascript["size"], css["size"], flash["size"], xml["size"],
                       html["size"], Json["size"], video["size"],
@@ -261,11 +263,12 @@ for file in dirs:
                       html["n_size"], Json["n_size"], video["n_size"],
                       "n_loadTime:", image["n_loadTime"], javascript["n_loadTime"], css["n_loadTime"],
                       flash["n_loadTime"], xml["n_loadTime"],
-                      html["n_loadTime"], Json["n_loadTime"], video["n_loadTime"]]
+                      html["n_loadTime"], Json["n_loadTime"], video["n_loadTime"]])
 
         with open("data.csv", 'a') as f:
             writer = csv.writer(f, dialect='excel')
             writer.writerow(row_values)
+graph_2.plot_graph_2(row_values)
 print(len(rank_spread["1-400"]), rank_spread["1-400"])
 print(len(rank_spread["400-1000"]), rank_spread["400-1000"])
 print(len(rank_spread["1000-2500"]), rank_spread["1000-2500"])

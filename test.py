@@ -17,15 +17,22 @@ def get_host(url):
         s = s[len(s) - 2] + '.' + s[len(s) - 1]
     return s
 
+
 path = "D:/harsample/untitled folder/"
 dirs = os.listdir(path)
 pattern_har = re.compile(".*.har")
 i = 1
 
-rank_dict={}
+rank_dict = {}
 with open("ranklist") as tsvfile:
     tsvreader = csv.reader(tsvfile, delimiter="\t")
+    for line in tsvreader:
+        try:
+            rank_dict[line[1]] = int(line[0])
+        except:
+            continue
 
+serverCache = {}
 for file in dirs:
     if pattern_har.match(file):
         file = path + file
@@ -39,13 +46,22 @@ for file in dirs:
         host = []
         try:
             host.append(data['log']['entries'][0]['request']["headers"][0]['value'])
+            host[0] = get_host(host[0])
+            rank = rank_dict[host[0]]
         except:
             continue
         nameServers = []
-        answer = dns.resolver.query(get_host(host[0]), "NS")
-        for nameServer in answer:
+        print(host[0])
+        if serverCache.get(host[0], 0) == 0:
+            try:
+                serverCache[host[0]] = dns.resolver.query(host[0], "NS")
+            except:
+                continue
+        # answer = dns.resolver.query(get_host(host[0]), "NS")
+        print("serverCache", serverCache)
+        for nameServer in serverCache[host[0]]:
             nameServers.append(str(nameServer)[:len(str(nameServer)) - 1])
-        print(nameServers)
+        print("nameServers:", nameServers)
 
         total = {"request": 0, "size": 0, "loadTime": 0}
         css = {"object": 0, "size": 0, "loadTime": 0}
@@ -128,8 +144,14 @@ for file in dirs:
             try:
                 if entry['request']["headers"][0]['value'] not in host:
                     host.append(entry['request']["headers"][0]['value'])
-                    answer = dns.resolver.query(get_host(host[len(host) - 1]), "NS")
-                    for ns in answer:
+                    if serverCache.get(get_host(host[len(host) - 1]), 0) == 0:
+                        try:
+                            serverCache[get_host(host[len(host) - 1])] = dns.resolver.query(
+                                get_host(host[len(host) - 1]), "NS")
+                        except:
+                            continue
+                    # answer = dns.resolver.query(get_host(host[len(host) - 1]), "NS")
+                    for ns in serverCache[get_host(host[len(host) - 1])]:
                         if str(ns)[:len(str(ns)) - 1] in nameServers:
                             originNumber += 1
                             find_flag = 1
@@ -141,7 +163,7 @@ for file in dirs:
             except:
                 pass
 
-        print("hostName:", get_host(host[0]))
+        print("hostName:", get_host(host[0]), rank_dict[host[0]])
         print("Number of servers:", len(host))
         print("originNumber:", originNumber)
         print("non_origin:", non_origin)
@@ -157,4 +179,25 @@ for file in dirs:
         print('video:', video)
         print(i)
         i += 1
-        print()
+
+        if rank <= 400:
+            cat = 1
+        elif rank <= 1000:
+            cat = 2
+        elif rank <= 2500:
+            cat = 3
+        elif rank <= 10000:
+            cat = 4
+        elif rank <= 20000:
+            cat = 5
+
+        row_values = [rank, cat, image["object"], javascript["object"], css["object"], flash["object"], xml["object"],
+                      html["object"], Json["object"], video["object"], image["size"], javascript["size"], css["size"],
+                      flash["size"], xml["size"],
+                      html["size"], Json["size"], video["size"], image["loadTime"], javascript["loadTime"],
+                      css["loadTime"], flash["loadTime"], xml["loadTime"],
+                      html["loadTime"], Json["loadTime"], video["loadTime"]]
+
+        with open("data.csv", 'a') as f:
+            writer = csv.writer(f, dialect='excel')
+            writer.writerow(row_values)

@@ -19,17 +19,31 @@ def fraction(d, value):
 def graph_1(dataset):
     x = [[], [], [], [], []]
     y = [[], [], [], [], []]
+    rank_cat = ("1-400", "401-1k", "1001-2.5k", "5k-10k", "10001-20k")
+    names = []
     for site in dataset:
-        x[site[1]-1].append(site[2])
+        x[site[1] - 1].append(site[2])
     print(x)
     print(y)
     n = 0
+    fig, ax = plt.subplots()
     while n < 5:
         x[n].sort()
         for element in x[n]:
             y[n].append(fraction(x[n], element))
-        plt.plot(x[n], y[n])
+        ax.plot(x[n], y[n], label=rank_cat[n])
         n += 1
+
+    legend = ax.legend(loc='lower right', shadow=True)
+    frame = legend.get_frame()
+    frame.set_facecolor('0.90')
+
+    for label in legend.get_texts():
+        label.set_fontsize('large')
+
+    for label in legend.get_lines():
+        label.set_linewidth(1.5)  # the legend line width
+
 
     plt.figure(1)
     plt.yscale('linear')
@@ -52,7 +66,7 @@ def get_host(url):
 
 
 # path = "/home/kartik/Documents/untitled folder/"
-path = "D:/harsample/untitled folder/"
+path = "D:/harsample/untitled folder2/"
 dirs = os.listdir(path)
 pattern_har = re.compile(".*.har")
 i = 1

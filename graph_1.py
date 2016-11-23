@@ -1,9 +1,41 @@
+import matplotlib.pyplot as plt
 import json
 import os
 import re
 import dns.resolver
-import graph_2
 import csv
+
+
+def fraction(d, value):
+    count = 0
+    for element in d:
+        if element <= value:
+            count += 1
+        else:
+            break
+    return count / len(d)
+
+
+def graph_1(dataset):
+    x = [[], [], [], [], []]
+    y = [[], [], [], [], []]
+    for site in dataset:
+        x[site[1]-1].append(site[2])
+    print(x)
+    print(y)
+    n = 0
+    while n < 5:
+        x[n].sort()
+        for element in x[n]:
+            y[n].append(fraction(x[n], element))
+        plt.plot(x[n], y[n])
+        n += 1
+
+    plt.figure(1)
+    plt.yscale('linear')
+    plt.title('linear')
+    plt.grid(True)
+    plt.show()
 
 
 def get_host(url):
@@ -37,6 +69,7 @@ with open("ranklist") as tsvfile:
 serverCache = {}
 row_values = []
 rank_spread = {"1-400": {}, "400-1000": {}, "1000-2500": {}, "5000-10000": {}, "10000-20000": {}}
+NumOfServers = []
 for file in dirs:
     if pattern_har.match(file):
         file = path + file
@@ -248,32 +281,19 @@ for file in dirs:
                 rank_spread["10000-20000"][host[0]] = 1
             else:
                 rank_spread["10000-20000"][host[0]] += 1
-
-        row_values.append(
-            [rank, cat, image["object"], javascript["object"], css["object"], flash["object"], xml["object"],
-             html["object"], Json["object"], video["object"],
-             "size:", image["size"], javascript["size"], css["size"], flash["size"], xml["size"],
-             html["size"], Json["size"], video["size"],
-             "loadTime:", image["loadTime"], javascript["loadTime"], css["loadTime"], flash["loadTime"],
-             xml["loadTime"],
-             html["loadTime"], Json["loadTime"], video["loadTime"],
-             "n_object:", image["n_object"], javascript["n_object"], css["n_object"], flash["n_object"],
-             xml["n_object"],
-             html["n_object"], Json["n_object"], video["n_object"],
-             "n_size:", image["n_size"], javascript["n_size"], css["n_size"], flash["n_size"], xml["n_size"],
-             html["n_size"], Json["n_size"], video["n_size"],
-             "n_loadTime:", image["n_loadTime"], javascript["n_loadTime"], css["n_loadTime"],
-             flash["n_loadTime"], xml["n_loadTime"],
-             html["n_loadTime"], Json["n_loadTime"], video["n_loadTime"]])
-        NumOfServers = []
         NumOfServers.append([rank, cat, len(host)])
+        print(NumOfServers)
+graph_1(NumOfServers)
 
-        # with open("data.csv", 'a') as f:
-        #     writer = csv.writer(f, dialect='excel')
-        #     writer.writerow(row_values)
-graph_2.plot_graph_2(row_values)
-print(len(rank_spread["1-400"]), rank_spread["1-400"])
-print(len(rank_spread["400-1000"]), rank_spread["400-1000"])
-print(len(rank_spread["1000-2500"]), rank_spread["1000-2500"])
-print(len(rank_spread["5000-10000"]), rank_spread["5000-10000"])
-print(len(rank_spread["10000-20000"]), rank_spread["10000-20000"])
+
+
+
+# plt.figure(1)
+#
+# plt.subplot(221)
+# plt.plot(x, y)
+# plt.plot(a, b)
+# plt.yscale('linear')
+# plt.title('linear')
+# plt.grid(True)
+# plt.show()

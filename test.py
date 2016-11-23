@@ -37,6 +37,8 @@ with open("ranklist") as tsvfile:
 serverCache = {}
 row_values = []
 rank_spread = {"1-400": {}, "400-1000": {}, "1000-2500": {}, "5000-10000": {}, "10000-20000": {}}
+NumOfServers = []
+time_object = []
 for file in dirs:
     if pattern_har.match(file):
         file = path + file
@@ -90,6 +92,7 @@ for file in dirs:
         pattern_response = re.compile("2.*")
 
         total["request"] = len(data['log']['entries'])
+        total["loadTime"] = data['log']['pages'][0]['pageTimings']['onLoad']
 
         for entry in data['log']['entries']:
 
@@ -117,7 +120,7 @@ for file in dirs:
                 pass
 
             total["size"] += entry['response']['content']['size']
-            total["loadTime"] += entry['time']
+            #total["loadTime"] += entry['time']
 
             if (pattern_image.match(entry['response']['content']['mimeType']) and pattern_response.match(
                     str(entry['response']['status']))):
@@ -265,7 +268,7 @@ for file in dirs:
              "n_loadTime:", image["n_loadTime"], javascript["n_loadTime"], css["n_loadTime"],
              flash["n_loadTime"], xml["n_loadTime"],
              html["n_loadTime"], Json["n_loadTime"], video["n_loadTime"]])
-        NumOfServers = []
+
         NumOfServers.append([rank, cat, len(host)])
 
         # with open("data.csv", 'a') as f:

@@ -1,3 +1,4 @@
+import numpy as np
 import matplotlib.pyplot as plt
 import json
 import os
@@ -6,49 +7,31 @@ import dns.resolver
 import csv
 
 
-def fraction(d, value):
-    count = 0
-    for element in d:
-        if element <= value:
-            count += 1
-        else:
-            break
-    return count / len(d)
+def time_object_figure(dataset):
+    max_num = 31
+    data = []
 
-
-def graph_1(dataset):
-    x = [[], [], [], [], []]
-    y = [[], [], [], [], []]
-    rank_cat = ("1-400", "401-1k", "1001-2.5k", "5k-10k", "10001-20k")
-    names = []
-    for site in dataset:
-        x[site[1] - 1].append(site[2])
-    print(x)
-    print(y)
     n = 0
-    fig, ax = plt.subplots()
-    while n < 5:
-        x[n].sort()
-        for element in x[n]:
-            y[n].append(fraction(x[n], element))
-        ax.plot(x[n], y[n], label=rank_cat[n])
+    while n < max_num:
+        data.append([])
         n += 1
 
-    legend = ax.legend(loc='lower right', shadow=True)
-    frame = legend.get_frame()
-    frame.set_facecolor('0.90')
+    for site in dataset:
+        index = site[1] // 10
+        if index < max_num - 1:
+            data[index].append(site[0] / 1000)
+        else:
+            data[max_num - 1].append(site[0] / 1000)
 
-    for label in legend.get_texts():
-        label.set_fontsize('large')
-
-    for label in legend.get_lines():
-        label.set_linewidth(1.5)  # the legend line width
-
-
-    plt.figure(1)
-    plt.yscale('linear')
-    plt.title('linear')
-    plt.grid(True)
+    x_axis_name = np.arange(10, max_num * 10 - 1, 10)
+    fig, ax1 = plt.subplots(figsize=(20, 10))
+    plt.boxplot(data)
+    x_tick_names = plt.setp(ax1, xticklabels=x_axis_name)
+    plt.setp(x_tick_names, fontsize=10)
+    plt.ylim(0, 50)
+    ax1.set_title('RenderEnd and number of object', loc="left", fontsize=15)
+    ax1.set_xlabel('Number of Objects', fontsize=18)
+    ax1.set_ylabel('Load Time(s)', fontsize=18)
     plt.show()
 
 
@@ -66,7 +49,7 @@ def get_host(url):
 
 
 # path = "/home/kartik/Documents/untitled folder/"
-path = "D:/harsample/untitled folder2/"
+path = "D:/harsample/untitled folder/"
 dirs = os.listdir(path)
 pattern_har = re.compile(".*.har")
 i = 1
@@ -84,6 +67,7 @@ serverCache = {}
 row_values = []
 rank_spread = {"1-400": {}, "400-1000": {}, "1000-2500": {}, "5000-10000": {}, "10000-20000": {}}
 NumOfServers = []
+time_object = []
 for file in dirs:
     if pattern_har.match(file):
         file = path + file
@@ -249,6 +233,9 @@ for file in dirs:
                     other["n_size"] += entry['response']['content']['size']
                     other["n_loadTime"] += entry['time']
 
+        if total["loadTime"] <= 0:
+            continue
+
         print("hostName:", get_host(host[0]), "rank:", rank_dict[host[0]])
         print("Number of servers:", len(host))
         print("originServerNumber:", originServerNumber)
@@ -266,49 +253,6 @@ for file in dirs:
         print(i)
         i += 1
 
-        if rank <= 400:
-            cat = 1
-            if rank_spread["1-400"].get(host[0], 0) == 0:
-                rank_spread["1-400"][host[0]] = 1
-            else:
-                rank_spread["1-400"][host[0]] += 1
-        elif rank <= 1000:
-            cat = 2
-            if rank_spread["400-1000"].get(host[0], 0) == 0:
-                rank_spread["400-1000"][host[0]] = 1
-            else:
-                rank_spread["400-1000"][host[0]] += 1
-        elif rank <= 2500:
-            cat = 3
-            if rank_spread["1000-2500"].get(host[0], 0) == 0:
-                rank_spread["1000-2500"][host[0]] = 1
-            else:
-                rank_spread["1000-2500"][host[0]] += 1
-        elif rank <= 10000:
-            cat = 4
-            if rank_spread["5000-10000"].get(host[0], 0) == 0:
-                rank_spread["5000-10000"][host[0]] = 1
-            else:
-                rank_spread["5000-10000"][host[0]] += 1
-        elif rank <= 20000:
-            cat = 5
-            if rank_spread["10000-20000"].get(host[0], 0) == 0:
-                rank_spread["10000-20000"][host[0]] = 1
-            else:
-                rank_spread["10000-20000"][host[0]] += 1
-        NumOfServers.append([rank, cat, len(host)])
-        print(NumOfServers)
-graph_1(NumOfServers)
+        time_object.append([total["loadTime"], total["request"]])
 
-
-
-
-# plt.figure(1)
-#
-# plt.subplot(221)
-# plt.plot(x, y)
-# plt.plot(a, b)
-# plt.yscale('linear')
-# plt.title('linear')
-# plt.grid(True)
-# plt.show()
+time_object_figure(time_object)

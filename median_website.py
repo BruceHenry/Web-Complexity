@@ -2,9 +2,36 @@ import json
 import os
 import re
 import dns.resolver
-import graph_2
 import csv
-import median_website
+
+
+def median_site(dataset):
+    # image median
+    median = {"image": 0, "js": 0, "css": 0, "flash": 0, "xml": 0, "html": 0, "json": 0, "video": 0, "other": 0}
+    median_name = ("image", "js", "css", "flash", "xml", "html", "json", "video", "other")
+    count = 0
+
+    for key in median_name:
+        sort = sorted(dataset, key=lambda tup: tup[count])
+        length = len(sort)
+        if length % 2 == 0:
+            median[key] = (sort[length // 2 - 1][count] + sort[length // 2][count]) / 2
+        else:
+            median[key] = sort[length // 2][count]
+        count += 1
+    median_site = []
+
+    for site in dataset:
+        flag = 1
+        for i in range(len(median_name)):
+            if site[i] >= median[median_name[i]]:
+                continue
+            else:
+                flag = 0
+        if flag == 1:
+            median_site.append(site)
+
+    print(median_site)
 
 
 def get_host(url):
@@ -35,10 +62,12 @@ with open("ranklist") as tsvfile:
         except:
             continue
 
+test_data = []
+
 serverCache = {}
-row_values = []
+object_data = []
+size_data = []
 rank_spread = {"1-400": {}, "400-1000": {}, "1000-2500": {}, "5000-10000": {}, "10000-20000": {}}
-NumOfServers = []
 time_object = []
 for file in dirs:
     if pattern_har.match(file):
@@ -121,7 +150,7 @@ for file in dirs:
                 pass
 
             total["size"] += entry['response']['content']['size']
-            #total["loadTime"] += entry['time']
+            # total["loadTime"] += entry['time']
 
             if (pattern_image.match(entry['response']['content']['mimeType']) and pattern_response.match(
                     str(entry['response']['status']))):
@@ -205,6 +234,9 @@ for file in dirs:
                     other["n_size"] += entry['response']['content']['size']
                     other["n_loadTime"] += entry['time']
 
+        if total["loadTime"] <= 0:
+            continue
+
         print("hostName:", get_host(host[0]), "rank:", rank_dict[host[0]])
         print("Number of servers:", len(host))
         print("originServerNumber:", originServerNumber)
@@ -253,32 +285,21 @@ for file in dirs:
             else:
                 rank_spread["10000-20000"][host[0]] += 1
 
-        row_values.append(
-            [rank, cat, image["object"], javascript["object"], css["object"], flash["object"], xml["object"],
-             html["object"], Json["object"], video["object"],
-             "size:", image["size"], javascript["size"], css["size"], flash["size"], xml["size"],
-             html["size"], Json["size"], video["size"],
-             "loadTime:", image["loadTime"], javascript["loadTime"], css["loadTime"], flash["loadTime"],
-             xml["loadTime"],
-             html["loadTime"], Json["loadTime"], video["loadTime"],
-             "n_object:", image["n_object"], javascript["n_object"], css["n_object"], flash["n_object"],
+        object_data.append(
+            [image["n_object"], javascript["n_object"], css["n_object"], flash["n_object"],
              xml["n_object"],
-             html["n_object"], Json["n_object"], video["n_object"],
-             "n_size:", image["n_size"], javascript["n_size"], css["n_size"], flash["n_size"], xml["n_size"],
-             html["n_size"], Json["n_size"], video["n_size"],
-             "n_loadTime:", image["n_loadTime"], javascript["n_loadTime"], css["n_loadTime"],
-             flash["n_loadTime"], xml["n_loadTime"],
-             html["n_loadTime"], Json["n_loadTime"], video["n_loadTime"]])
+             html["n_object"], Json["n_object"], video["n_object"], other["n_object"], image["n_size"],
+             javascript["n_size"], css["n_size"], flash["n_size"], xml["n_size"],
+             html["n_size"], Json["n_size"], video["n_size"], other["n_size"]])
 
-        NumOfServers.append([rank, cat, len(host)])
+        # test_data = [image["n_object"], javascript["n_object"], css["n_object"], flash["n_object"],
+        #              xml["n_object"],
+        #              html["n_object"], Json["n_object"], video["n_object"], other["n_object"]]
 
-        # with open("data.csv", 'a') as f:
+        size_data.append([])
+
+        # with open("object_data.csv", 'a') as f:
         #     writer = csv.writer(f, dialect='excel')
-        #     writer.writerow(row_values)
-median_website.median_site(row_values)
-#graph_2.plot_graph_2(row_values)
-print(len(rank_spread["1-400"]), rank_spread["1-400"])
-print(len(rank_spread["400-1000"]), rank_spread["400-1000"])
-print(len(rank_spread["1000-2500"]), rank_spread["1000-2500"])
-print(len(rank_spread["5000-10000"]), rank_spread["5000-10000"])
-print(len(rank_spread["10000-20000"]), rank_spread["10000-20000"])
+        #     writer.writerow(test_data)
+
+median_site(object_data)

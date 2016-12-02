@@ -2,7 +2,6 @@ import json
 import os
 import re
 import dns.resolver
-import graph_2
 import csv
 
 
@@ -20,7 +19,7 @@ def get_host(url):
 
 
 # path = "/home/kartik/Documents/untitled folder/"
-path = "D:/harsample/untitled folder2/"
+path = "M:/hardata/"
 dirs = os.listdir(path)
 pattern_har = re.compile(".*.har")
 i = 1
@@ -39,9 +38,18 @@ with open("mapper.txt") as catfile:
     catreader = csv.reader(catfile, delimiter="\t")
     for line in catreader:
         try:
-            categories[line[1]] = line[0]
+            categories[line[0]] = line[1]
         except:
             continue
+
+# for x in categories:
+#     x_values = []
+#     x_values.append(x)
+#     x_values.append(categories[x])
+#     with open("data.csv", 'a') as f:
+#         writer = csv.writer(f, dialect='excel')
+#         writer.writerow(x_values)
+# print(categories)
 
 serverCache = {}
 row_values = []
@@ -59,16 +67,23 @@ for file in dirs:
         print(file)
 
         host = []
-        url = ""
+        ca = ""
         try:
             host.append(data['log']['entries'][0]['request']["headers"][0]['value'])
-            url = data['log']['entries'][0]['request']['url']
             host[0] = get_host(host[0])
+            url = "http://www." + host[0]
             rank = rank_dict[host[0]]
         except:
             continue
+
+        if categories.get(url, 0) == 0:
+            continue
+        else:
+            ca = categories[url]
+
+        print("Host Name:", host[0], "  Category:", ca, "  URL:", url)
+
         nameServers = []
-        print(host[0])
         if serverCache.get(host[0], 0) == 0:
             try:
                 serverCache[host[0]] = dns.resolver.query(host[0], "NS")
@@ -264,7 +279,7 @@ for file in dirs:
                 rank_spread["10000-20000"][host[0]] += 1
 
         row_values.append(
-            [rank, cat, image["object"], javascript["object"], css["object"], flash["object"], xml["object"],
+            [ca, cat, image["object"], javascript["object"], css["object"], flash["object"], xml["object"],
              html["object"], Json["object"], video["object"],
              "size:", image["size"], javascript["size"], css["size"], flash["size"], xml["size"],
              html["size"], Json["size"], video["size"],
@@ -278,7 +293,7 @@ for file in dirs:
              html["n_size"], Json["n_size"], video["n_size"],
              "n_loadTime:", image["n_loadTime"], javascript["n_loadTime"], css["n_loadTime"],
              flash["n_loadTime"], xml["n_loadTime"],
-             html["n_loadTime"], Json["n_loadTime"], video["n_loadTime"]])
+             html["n_loadTime"], Json["n_loadTime"], video["n_loadTime"], len(host)])
 
         NumOfServers.append([rank, cat, len(host)])
 
@@ -286,8 +301,6 @@ for file in dirs:
         #     writer = csv.writer(f, dialect='excel')
         #     writer.writerow(row_values)
 
-# median_website.median_site(row_values)
-# graph_2.plot_graph_2(row_values)
 print(len(rank_spread["1-400"]), rank_spread["1-400"])
 print(len(rank_spread["400-1000"]), rank_spread["400-1000"])
 print(len(rank_spread["1000-2500"]), rank_spread["1000-2500"])

@@ -52,10 +52,7 @@ with open("mapper.txt") as catfile:
 # print(categories)
 
 serverCache = {}
-row_values = []
 rank_spread = {"1-400": {}, "400-1000": {}, "1000-2500": {}, "5000-10000": {}, "10000-20000": {}}
-NumOfServers = []
-time_object = []
 for file in dirs:
     if pattern_har.match(file):
         file = path + file
@@ -90,7 +87,7 @@ for file in dirs:
             except:
                 continue
         # answer = dns.resolver.query(get_host(host[0]), "NS")
-        print("serverCache", serverCache)
+        # print("serverCache", serverCache)
         for nameServer in serverCache[host[0]]:
             nameServers.append(str(nameServer)[:len(str(nameServer)) - 1])
         print("nameServers:", nameServers)
@@ -119,6 +116,8 @@ for file in dirs:
 
         total["request"] = len(data['log']['entries'])
         total["loadTime"] = data['log']['pages'][0]['pageTimings']['onLoad']
+        if total["loadTime"] <= 0:
+            continue
 
         for entry in data['log']['entries']:
 
@@ -230,6 +229,7 @@ for file in dirs:
                     other["n_size"] += entry['response']['content']['size']
                     other["n_loadTime"] += entry['time']
 
+
         print("hostName:", get_host(host[0]), "rank:", rank_dict[host[0]])
         print("Number of servers:", len(host))
         print("originServerNumber:", originServerNumber)
@@ -278,28 +278,30 @@ for file in dirs:
             else:
                 rank_spread["10000-20000"][host[0]] += 1
 
-        row_values.append(
-            [ca, cat, image["object"], javascript["object"], css["object"], flash["object"], xml["object"],
-             html["object"], Json["object"], video["object"],
-             "size:", image["size"], javascript["size"], css["size"], flash["size"], xml["size"],
-             html["size"], Json["size"], video["size"],
-             "loadTime:", image["loadTime"], javascript["loadTime"], css["loadTime"], flash["loadTime"],
-             xml["loadTime"],
-             html["loadTime"], Json["loadTime"], video["loadTime"],
-             "n_object:", image["n_object"], javascript["n_object"], css["n_object"], flash["n_object"],
-             xml["n_object"],
-             html["n_object"], Json["n_object"], video["n_object"],
-             "n_size:", image["n_size"], javascript["n_size"], css["n_size"], flash["n_size"], xml["n_size"],
-             html["n_size"], Json["n_size"], video["n_size"],
-             "n_loadTime:", image["n_loadTime"], javascript["n_loadTime"], css["n_loadTime"],
-             flash["n_loadTime"], xml["n_loadTime"],
-             html["n_loadTime"], Json["n_loadTime"], video["n_loadTime"], len(host)])
+        row_values = [
+            ca, cat, image["object"], javascript["object"], css["object"], flash["object"], xml["object"],
+            html["object"], Json["object"], video["object"],
+            "size:", image["size"], javascript["size"], css["size"], flash["size"], xml["size"],
+            html["size"], Json["size"], video["size"],
+            "loadTime:", image["loadTime"], javascript["loadTime"], css["loadTime"], flash["loadTime"],
+            xml["loadTime"],
+            html["loadTime"], Json["loadTime"], video["loadTime"],
+            "n_object:", image["n_object"], javascript["n_object"], css["n_object"], flash["n_object"],
+            xml["n_object"],
+            html["n_object"], Json["n_object"], video["n_object"],
+            "n_size:", image["n_size"], javascript["n_size"], css["n_size"], flash["n_size"], xml["n_size"],
+            html["n_size"], Json["n_size"], video["n_size"],
+            "n_loadTime:", image["n_loadTime"], javascript["n_loadTime"], css["n_loadTime"],
+            flash["n_loadTime"], xml["n_loadTime"],
+            html["n_loadTime"], Json["n_loadTime"], video["n_loadTime"], total["loadTime"], total["size"],
+            total["request"], non_origin_total["loadTime"], non_origin_total["size"], non_origin_total["object"],
+            len(host)]
 
-        NumOfServers.append([rank, cat, len(host)])
+        # NumOfServers.append([rank, cat, len(host)])
 
-        # with open("data.csv", 'a') as f:
-        #     writer = csv.writer(f, dialect='excel')
-        #     writer.writerow(row_values)
+        with open("data.csv", 'a', newline='') as f:
+            writer = csv.writer(f, dialect='excel', delimiter="\t")
+            writer.writerow(row_values)
 
 print(len(rank_spread["1-400"]), rank_spread["1-400"])
 print(len(rank_spread["400-1000"]), rank_spread["400-1000"])

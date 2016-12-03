@@ -282,7 +282,7 @@ for file in dirs:
 
         NumOfServers.append([rank, cat, len(host)])
 
-        # with open("data.csv", 'a') as f:
+        # with open("datatest.csv", 'a') as f:
         #     writer = csv.writer(f, dialect='excel')
         #     writer.writerow(row_values)
 

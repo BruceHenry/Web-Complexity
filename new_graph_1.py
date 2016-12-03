@@ -96,8 +96,9 @@ def graph_1_category(dataset):
 
 dataset = []
 with open("data.csv") as tsvfile:
-    csvreader = csv.reader(tsvfile, delimiter="\t")
+    csvreader = csv.reader(tsvfile)#, delimiter="\t"
     for line in csvreader:
-        dataset.append([line[0], int(line[1]), int(line[61])])
+        # category name, rank range, number of servers
+        dataset.append([line[2], int(float(line[1])), int(float(line[57]))])
 graph_1_rank(dataset)
 graph_1_category(dataset)

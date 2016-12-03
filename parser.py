@@ -3,6 +3,7 @@ import os
 import re
 import dns.resolver
 import csv
+import statistics
 
 
 def get_host(url):
@@ -18,7 +19,21 @@ def get_host(url):
     return s
 
 
+def find_rank_range(rank):
+    if rank <= 400:
+        return 1
+    elif rank <= 1000:
+        return 2
+    elif rank <= 2500:
+        return 3
+    elif rank <= 10000:
+        return 4
+    elif rank <= 20000:
+        return 5
+
+
 # path = "/home/kartik/Documents/untitled folder/"
+# path = "D:/harsample/untitled folder/"
 path = "M:/hardata/"
 dirs = os.listdir(path)
 pattern_har = re.compile(".*.har")
@@ -46,11 +61,11 @@ with open("mapper.txt") as catfile:
 #     x_values = []
 #     x_values.append(x)
 #     x_values.append(categories[x])
-#     with open("data.csv", 'a') as f:
+#     with open("datatest.csv", 'a') as f:
 #         writer = csv.writer(f, dialect='excel')
 #         writer.writerow(x_values)
 # print(categories)
-
+site = {}
 serverCache = {}
 rank_spread = {"1-400": {}, "400-1000": {}, "1000-2500": {}, "5000-10000": {}, "10000-20000": {}}
 for file in dirs:
@@ -229,7 +244,6 @@ for file in dirs:
                     other["n_size"] += entry['response']['content']['size']
                     other["n_loadTime"] += entry['time']
 
-
         print("hostName:", get_host(host[0]), "rank:", rank_dict[host[0]])
         print("Number of servers:", len(host))
         print("originServerNumber:", originServerNumber)
@@ -279,29 +293,56 @@ for file in dirs:
                 rank_spread["10000-20000"][host[0]] += 1
 
         row_values = [
-            ca, cat, image["object"], javascript["object"], css["object"], flash["object"], xml["object"],
+            image["object"], javascript["object"], css["object"], flash["object"], xml["object"],
             html["object"], Json["object"], video["object"],
-            "size:", image["size"], javascript["size"], css["size"], flash["size"], xml["size"],
+            image["size"], javascript["size"], css["size"], flash["size"], xml["size"],
             html["size"], Json["size"], video["size"],
-            "loadTime:", image["loadTime"], javascript["loadTime"], css["loadTime"], flash["loadTime"],
+            image["loadTime"], javascript["loadTime"], css["loadTime"], flash["loadTime"],
             xml["loadTime"],
             html["loadTime"], Json["loadTime"], video["loadTime"],
-            "n_object:", image["n_object"], javascript["n_object"], css["n_object"], flash["n_object"],
+            image["n_object"], javascript["n_object"], css["n_object"], flash["n_object"],
             xml["n_object"],
             html["n_object"], Json["n_object"], video["n_object"],
-            "n_size:", image["n_size"], javascript["n_size"], css["n_size"], flash["n_size"], xml["n_size"],
+            image["n_size"], javascript["n_size"], css["n_size"], flash["n_size"], xml["n_size"],
             html["n_size"], Json["n_size"], video["n_size"],
-            "n_loadTime:", image["n_loadTime"], javascript["n_loadTime"], css["n_loadTime"],
+            image["n_loadTime"], javascript["n_loadTime"], css["n_loadTime"],
             flash["n_loadTime"], xml["n_loadTime"],
             html["n_loadTime"], Json["n_loadTime"], video["n_loadTime"], total["loadTime"], total["size"],
             total["request"], non_origin_total["loadTime"], non_origin_total["size"], non_origin_total["object"],
             len(host)]
 
-        # NumOfServers.append([rank, cat, len(host)])
+        if host[0] not in site:
+            site[host[0]] = []
+        site[host[0]].append(row_values)
 
-        with open("data.csv", 'a', newline='') as f:
-            writer = csv.writer(f, dialect='excel', delimiter="\t")
-            writer.writerow(row_values)
+for key, value in site.items():
+    median_parameter = []
+    for i in range(0, len(row_values)):
+        median = []
+        for j in range(0, len(value)):
+            median.append(value[j][i])
+        median_parameter.append(statistics.median(median))
+    site[key] = median_parameter
+
+with open("flash.csv") as tsvfile:
+    csvreader = csv.reader(tsvfile)  # , delimiter="\t"
+    for line in csvreader:
+        try:
+            site[line[0]][3] = line[1]  # flash object number
+            site[line[0]][19] = line[2]  # flash size
+            site[line[0]][11] = line[3]  # flash load time
+        except:
+            continue
+
+for key in site:
+    row = []
+    row.append(key)
+    row.append(find_rank_range(rank_dict[key]))
+    row.append(categories["http://www." + key])
+    row = row + site[key]
+    with open("data.csv", 'a', newline='') as f:
+        writer = csv.writer(f, dialect='excel')  # , delimiter="\t"
+        writer.writerow(row)
 
 print(len(rank_spread["1-400"]), rank_spread["1-400"])
 print(len(rank_spread["400-1000"]), rank_spread["400-1000"])

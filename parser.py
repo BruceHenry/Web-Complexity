@@ -137,6 +137,7 @@ for file in dirs:
         for entry in data['log']['entries']:
 
             find_flag = 0  # 0 means non-origin, 1 means origin.
+
             try:
                 if entry['request']["headers"][0]['value'] not in host:
                     host.append(entry['request']["headers"][0]['value'])
@@ -309,7 +310,7 @@ for file in dirs:
             flash["n_loadTime"], xml["n_loadTime"],
             html["n_loadTime"], Json["n_loadTime"], video["n_loadTime"], total["loadTime"], total["size"],
             total["request"], non_origin_total["loadTime"], non_origin_total["size"], non_origin_total["object"],
-            len(host)]
+            len(host), other["n_object"], other["n_size"]]
 
         if host[0] not in site:
             site[host[0]] = []
@@ -324,13 +325,34 @@ for key, value in site.items():
         median_parameter.append(statistics.median(median))
     site[key] = median_parameter
 
-with open("flash.csv") as tsvfile:
+with open("sitespeed.csv") as tsvfile:
     csvreader = csv.reader(tsvfile)  # , delimiter="\t"
     for line in csvreader:
         try:
-            site[line[0]][3] = line[1]  # flash object number
-            site[line[0]][19] = line[2]  # flash size
-            site[line[0]][11] = line[3]  # flash load time
+            site[line[0]][6] = line[1]  # flash object number
+            site[line[0]][22] = line[2]  # flash load time
+            site[line[0]][14] = line[3]  # flash size
+            site[line[0]][3] = line[4]  # ImagenumObjects
+            site[line[0]][19] = line[5]  # Image loadtime
+            site[line[0]][11] = line[6]  # Image byte
+            site[line[0]][5] = line[7]  # css obj
+            site[line[0]][21] = line[8]  # css loadtime
+            site[line[0]][13] = line[9]  # css byte
+            site[line[0]][4] = line[10]  # javascript obj
+            site[line[0]][20] = line[11]  # javascript  load time
+            site[line[0]][12] = line[12]  # javascript byte
+            site[line[0]][7] = line[13]  # xml obj
+            site[line[0]][23] = line[14]  # xml loadtime
+            site[line[0]][15] = line[15]  # xml byte
+            site[line[0]][8] = line[16]  # html obj
+            site[line[0]][24] = line[17]  # html loadtime
+            site[line[0]][16] = line[18]  # html byte
+            site[line[0]][9] = line[19]  # json obj
+            site[line[0]][25] = line[20]  # json loadtime
+            site[line[0]][17] = line[21]  # json byte
+            site[line[0]][10] = line[22]  # video obj
+            site[line[0]][26] = line[23]  # video loadtime
+            site[line[0]][18] = line[24]  # video byte
         except:
             continue
 
@@ -343,7 +365,6 @@ for key in site:
     with open("data.csv", 'a', newline='') as f:
         writer = csv.writer(f, dialect='excel')  # , delimiter="\t"
         writer.writerow(row)
-
 
 print(len(rank_spread["1-400"]), rank_spread["1-400"])
 print(len(rank_spread["400-1000"]), rank_spread["400-1000"])

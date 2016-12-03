@@ -14,25 +14,25 @@ def fraction(d, value):
 
 
 def graph_5(dataset):
-    x = [[], [], [], [], [], [], [], [], [], [], [], []]
-    y = [[], [], [], [], [], [], [], [], [], [], [], []]
+    x = [[], [], [], [], [], [], [], []]
+    y = [[], [], [], [], [], [], [], []]
     categories = (
-        "newsandmedia", "business", "shopping", "education", "entertainment", "sports", "travel", "informationtech",
-        "streamingmedia", "health", "adult", "other")
+        "newsandmedia", "business", "shopping", "education", "entertainment", "informationtech", "adult", "other")
     for site in dataset:
         ca = site[0]
         if ca not in categories:
-            ca = "other"
+            if ca in ['sports', "travel", "streamingmedia"]:
+                ca = "entertainment"
+            else:
+                ca = "other"
         x[categories.index(ca)].append(site[1])
-    print(x)
-    print(y)
     n = 0
     fig, ax = plt.subplots()
     # cmap = plt.get_cmap('jet')
     # colors = cmap(np.linspace(0, 1.0, len(categories)))
 
     count = 0
-    while n < 12:
+    while n < 8:
         x[n].sort()
         for element in x[n]:
             y[n].append(fraction(x[n], element))
@@ -40,16 +40,19 @@ def graph_5(dataset):
             count += 1
         n += 1
 
-
     cmap = plt.get_cmap('jet')
     colors = cmap(np.linspace(0, 1.0, count))
 
     n = 0
     for color in colors:
-        if len(x[n]) != 0:
-            ax.plot(x[n], y[n], label=categories[n], color=color)
+        while len(x[n]) == 0:
+            n += 1
+        x[n] = [0.0] + x[n]
+        y[n] = [0.0] + y[n]
+        ax.plot(x[n], y[n], label=categories[n], color=color, linewidth=2.0)
         n += 1
-
+    # print(x)
+    # print(y)
     legend = ax.legend(loc='lower right', shadow=True)
     frame = legend.get_frame()
     frame.set_facecolor('0.90')
@@ -61,6 +64,7 @@ def graph_5(dataset):
         label.set_linewidth(3)  # the legend line width
 
     plt.figure(1)
+    plt.xlim(0, 0.25)
     plt.yscale('linear')
     plt.title('linear')
     plt.grid(True)
@@ -72,7 +76,6 @@ with open("data.csv") as tsvfile:
     csvreader = csv.reader(tsvfile)  # , delimiter="\t"
     for line in csvreader:
         if int(float(line[6])) != 0:
-            print(line)
-            dataset.append([line[2], (float(line[6]) / float(line[57]))])
+            dataset.append([line[2], (float(line[6]) / (float(line[6]) + float(line[53])))])
 
 graph_5(dataset)

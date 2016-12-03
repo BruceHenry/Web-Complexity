@@ -27,7 +27,9 @@ def graph_1_rank(dataset):
         x[n].sort()
         for element in x[n]:
             y[n].append(fraction(x[n], element))
-        ax.plot(x[n], y[n], label=rank_cat[n])
+        x[n] = [0.0] + x[n]
+        y[n] = [0.0] + y[n]
+        ax.plot(x[n], y[n], label=rank_cat[n], linewidth=2.0)
         n += 1
 
     legend = ax.legend(loc='lower right', shadow=True)
@@ -42,21 +44,23 @@ def graph_1_rank(dataset):
 
     plt.figure(1)
     plt.yscale('linear')
-    plt.title('linear')
+    plt.title('Num of objects by rank')
     plt.grid(True)
     plt.show()
 
 
 def graph_1_category(dataset):
-    x = [[], [], [], [], [], [], [], [], [], [], [], []]
-    y = [[], [], [], [], [], [], [], [], [], [], [], []]
+    x = [[], [], [], [], [], [], [], []]
+    y = [[], [], [], [], [], [], [], []]
     categories = (
-        "newsandmedia", "business", "shopping", "education", "entertainment", "sports", "travel", "informationtech",
-        "streamingmedia", "health", "adult", "other")
+        "newsandmedia", "business", "shopping", "education", "entertainment", "informationtech", "adult", "other")
     for site in dataset:
         ca = site[0]
         if ca not in categories:
-            ca = "other"
+            if ca in ['sports', "travel", "streamingmedia"]:
+                ca = "entertainment"
+            else:
+                ca = "other"
         x[categories.index(ca)].append(site[2])
     print(x)
     print(y)
@@ -65,7 +69,7 @@ def graph_1_category(dataset):
     cmap = plt.get_cmap('jet')
     colors = cmap(np.linspace(0, 1.0, len(categories)))
 
-    while n < 12:
+    while n < 8:
         x[n].sort()
         for element in x[n]:
             y[n].append(fraction(x[n], element))
@@ -74,7 +78,9 @@ def graph_1_category(dataset):
 
     n = 0
     for color in colors:
-        ax.plot(x[n], y[n], label=categories[n], color=color)
+        x[n] = [0.0] + x[n]
+        y[n] = [0.0] + y[n]
+        ax.plot(x[n], y[n], label=categories[n], color=color, linewidth=2.0)
         n += 1
 
     legend = ax.legend(loc='lower right', shadow=True)
@@ -89,16 +95,17 @@ def graph_1_category(dataset):
 
     plt.figure(1)
     plt.yscale('linear')
-    plt.title('linear')
+    plt.title('Num of objects by category')
     plt.grid(True)
     plt.show()
 
 
 dataset = []
 with open("data.csv") as tsvfile:
-    csvreader = csv.reader(tsvfile)#, delimiter="\t"
+    csvreader = csv.reader(tsvfile)  # , delimiter="\t"
     for line in csvreader:
+        print(len(line))
         # category name, rank range, number of servers
-        dataset.append([line[2], int(float(line[1])), int(float(line[57]))])
+        dataset.append([line[2], int(float(line[1])), int(float(line[53]))])
 graph_1_rank(dataset)
 graph_1_category(dataset)

@@ -4,7 +4,7 @@ import numpy as np
 
 
 def time_object_figure(dataset):
-    max_num = 50
+    max_num = 24
     data = []
 
     n = 0

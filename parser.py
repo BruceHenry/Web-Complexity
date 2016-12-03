@@ -344,6 +344,7 @@ for key in site:
         writer = csv.writer(f, dialect='excel')  # , delimiter="\t"
         writer.writerow(row)
 
+
 print(len(rank_spread["1-400"]), rank_spread["1-400"])
 print(len(rank_spread["400-1000"]), rank_spread["400-1000"])
 print(len(rank_spread["1000-2500"]), rank_spread["1000-2500"])

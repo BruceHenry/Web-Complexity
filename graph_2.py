@@ -66,7 +66,7 @@ median_objects = [statistics.median(rank_spread[1]['image_object']),
 sub = fig.add_subplot(221)
 sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
 sub.set_xticks(x_pos)
-sub.set_xticklabels(rank_cat, rotation='vertical')
+sub.set_xticklabels(rank_cat, rotation=60)
 sub.set_ylabel('Median No. of Objects')
 sub.set_title('Image')
 
@@ -79,7 +79,7 @@ median_objects = [statistics.median(rank_spread[1]['javascript_object']),
 sub = fig.add_subplot(222)
 sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
 sub.set_xticks(x_pos)
-sub.set_xticklabels(rank_cat, rotation='vertical')
+sub.set_xticklabels(rank_cat, rotation=60)
 sub.set_ylabel('Median No. of Objects')
 sub.set_title('Javascript')
 # CSS
@@ -91,7 +91,7 @@ median_objects = [statistics.median(rank_spread[1]['css_object']),
 sub = fig.add_subplot(223)
 sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
 sub.set_xticks(x_pos)
-sub.set_xticklabels(rank_cat, rotation='vertical')
+sub.set_xticklabels(rank_cat, rotation=60)
 sub.set_ylabel('Median No. of Objects')
 sub.set_title('CSS')
 
@@ -105,7 +105,7 @@ sub = fig.add_subplot(224)
 sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
 sub.set_xticks(x_pos)
 sub.set_ylim([0, 5])
-sub.set_xticklabels(rank_cat, rotation='vertical')
+sub.set_xticklabels(rank_cat, rotation=60)
 sub.set_ylabel('Median No. of Objects')
 sub.set_title('flash')
 
@@ -116,6 +116,9 @@ plt.show()
 categories = (
     "newsandmedia", "business", "shopping", "education", "entertainment", "sports", "travel", "informationtech",
     "streamingmedia", "health", "adult", "other")
+categories_name = (
+    "news & media", "business", "shopping", "education", "entertainment", "sports", "travel", "information & tech",
+    "streaming media", "health", "adult", "other")
 graph = ["image", "javascript", "CSS", "flash"]
 fig = plt.figure(figsize=(12, 12))
 plots = [221, 222, 223, 224]
@@ -139,7 +142,7 @@ for j in range(0, 4):
         sub.set_ylim([0, 5])
     sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
     sub.set_xticks(x_pos)
-    sub.set_xticklabels(categories, rotation='vertical')
+    sub.set_xticklabels(categories_name, rotation=85)
     sub.set_ylabel('Median No. of Objects')
     sub.set_title(graph[j])
 fig.subplots_adjust(hspace=.5)
@@ -170,7 +173,7 @@ for j in range(0, 4):
         sub.set_ylim([0, 5])
     sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
     sub.set_xticks(x_pos)
-    sub.set_xticklabels(categories, rotation='vertical')
+    sub.set_xticklabels(categories_name, rotation=85)
     sub.set_ylabel('Total % of byte downloaded')
     sub.set_title(graph[j])
 

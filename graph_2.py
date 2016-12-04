@@ -51,32 +51,7 @@ for site in dataset:
         rank_spread[5]['css_object'].append(site[4])
         rank_spread[5]['flash_object'].append(site[5])
 
-        # sort the lists according to find the median
-rank_spread[1]['image_object'].sort()
-rank_spread[1]['javascript_object'].sort()
-rank_spread[1]['css_object'].sort()
-rank_spread[1]['flash_object'].sort()
-
-rank_spread[2]['image_object'].sort()
-rank_spread[2]['javascript_object'].sort()
-rank_spread[2]['css_object'].sort()
-rank_spread[2]['flash_object'].sort()
-
-rank_spread[3]['image_object'].sort()
-rank_spread[3]['javascript_object'].sort()
-rank_spread[3]['css_object'].sort()
-rank_spread[3]['flash_object'].sort()
-
-rank_spread[4]['image_object'].sort()
-rank_spread[4]['javascript_object'].sort()
-rank_spread[4]['css_object'].sort()
-rank_spread[4]['flash_object'].sort()
-
-rank_spread[5]['image_object'].sort()
-rank_spread[5]['javascript_object'].sort()
-rank_spread[5]['css_object'].sort()
-rank_spread[5]['flash_object'].sort()
-
+fig = plt.figure(figsize=(12, 12))
 # creating the graph
 rank_cat = ("1-400", "401-1k", "1001-2.5k", "5k-10k", "10001-20k")
 x_pos = np.arange(len(rank_cat))
@@ -88,12 +63,12 @@ median_objects = [statistics.median(rank_spread[1]['image_object']),
                   statistics.median(rank_spread[3]['image_object']),
                   statistics.median(rank_spread[4]['image_object']),
                   statistics.median(rank_spread[5]['image_object'])]
-
-plt.bar(x_pos, median_objects, align='center', alpha=0.5, color=colors)
-plt.xticks(x_pos, rank_cat)
-plt.ylabel('Median No. of Objects')
-plt.title('Image')
-plt.show()
+sub = fig.add_subplot(221)
+sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
+sub.set_xticks(x_pos)
+sub.set_xticklabels(rank_cat, rotation='vertical')
+sub.set_ylabel('Median No. of Objects')
+sub.set_title('Image')
 
 # javascript
 median_objects = [statistics.median(rank_spread[1]['javascript_object']),
@@ -101,33 +76,40 @@ median_objects = [statistics.median(rank_spread[1]['javascript_object']),
                   statistics.median(rank_spread[3]['javascript_object']),
                   statistics.median(rank_spread[4]['javascript_object']),
                   statistics.median(rank_spread[5]['javascript_object'])]
-plt.bar(x_pos, median_objects, align='center', alpha=0.5, color=colors)
-plt.xticks(x_pos, rank_cat)
-plt.ylabel('Median No. of Objects')
-plt.title('Javascript')
-plt.show()
+sub = fig.add_subplot(222)
+sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
+sub.set_xticks(x_pos)
+sub.set_xticklabels(rank_cat, rotation='vertical')
+sub.set_ylabel('Median No. of Objects')
+sub.set_title('Javascript')
 # CSS
 median_objects = [statistics.median(rank_spread[1]['css_object']),
                   statistics.median(rank_spread[2]['css_object']),
                   statistics.median(rank_spread[3]['css_object']),
                   statistics.median(rank_spread[4]['css_object']),
                   statistics.median(rank_spread[5]['css_object'])]
-plt.bar(x_pos, median_objects, align='center', alpha=0.5, color=colors)
-plt.xticks(x_pos, rank_cat)
-plt.ylabel('Median No. of Objects')
-plt.title('CSS')
-plt.show()
+sub = fig.add_subplot(223)
+sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
+sub.set_xticks(x_pos)
+sub.set_xticklabels(rank_cat, rotation='vertical')
+sub.set_ylabel('Median No. of Objects')
+sub.set_title('CSS')
+
 # flash
 median_objects = [statistics.median(rank_spread[1]['flash_object']),
                   statistics.median(rank_spread[2]['flash_object']),
                   statistics.median(rank_spread[3]['flash_object']),
                   statistics.median(rank_spread[4]['flash_object']),
                   statistics.median(rank_spread[5]['flash_object'])]
-plt.bar(x_pos, median_objects, align='center', alpha=0.5, color=colors)
-plt.xticks(x_pos, rank_cat)
-plt.ylim(0, 5)
-plt.ylabel('Median No. of Objects')
-plt.title('Flash')
+sub = fig.add_subplot(224)
+sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
+sub.set_xticks(x_pos)
+sub.set_ylim([0, 5])
+sub.set_xticklabels(rank_cat, rotation='vertical')
+sub.set_ylabel('Median No. of Objects')
+sub.set_title('flash')
+
+fig.subplots_adjust(hspace=.5)
 plt.show()
 
 # category to number of objects
@@ -135,7 +117,8 @@ categories = (
     "newsandmedia", "business", "shopping", "education", "entertainment", "sports", "travel", "informationtech",
     "streamingmedia", "health", "adult", "other")
 graph = ["image", "javascript", "CSS", "flash"]
-
+fig = plt.figure(figsize=(12, 12))
+plots = [221, 222, 223, 224]
 for j in range(0, 4):
     x = [[], [], [], [], [], [], [], [], [], [], [], []]
     colors = []
@@ -151,16 +134,21 @@ for j in range(0, 4):
     median_objects = []
     for i in range(len(x)):
         median_objects.append(statistics.median(x[i]))
-    plt.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
-    plt.xticks(x_pos, categories, rotation='vertical')
-    plt.ylabel('Median No. of Objects')
+    sub = fig.add_subplot(plots[j])
     if j == 3:
-        plt.ylim(0, 5)
-    plt.title(graph[j])
-    plt.subplots_adjust(bottom=0.2)
-    plt.show()
-count = 0
+        sub.set_ylim([0, 5])
+    sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
+    sub.set_xticks(x_pos)
+    sub.set_xticklabels(categories, rotation='vertical')
+    sub.set_ylabel('Median No. of Objects')
+    sub.set_title(graph[j])
+fig.subplots_adjust(hspace=.5)
+plt.show()
+
 # category to total bytes downloaded
+count = 0
+fig = plt.figure(figsize=(12, 12))
+plots = [221, 222, 223, 224]
 for j in range(0, 4):
     x = [[], [], [], [], [], [], [], [], [], [], [], []]
     for site in dataset:
@@ -176,11 +164,15 @@ for j in range(0, 4):
     print(count)
     for i in range(len(x)):
         median_objects.append(statistics.median(x[i]))
+
+    sub = fig.add_subplot(plots[j])
     if j == 3:
-        plt.ylim(0, 1)
-    plt.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
-    plt.xticks(x_pos, categories, rotation='vertical')
-    plt.ylabel('Total % of byte downloaded')
-    plt.title(graph[j])
-    plt.subplots_adjust(bottom=0.2)
-    plt.show()
+        sub.set_ylim([0, 5])
+    sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
+    sub.set_xticks(x_pos)
+    sub.set_xticklabels(categories, rotation='vertical')
+    sub.set_ylabel('Total % of byte downloaded')
+    sub.set_title(graph[j])
+
+fig.subplots_adjust(hspace=.5)
+plt.show()

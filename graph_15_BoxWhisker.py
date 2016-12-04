@@ -33,8 +33,9 @@ def time_object_figure(dataset):
 
 dataset = []
 with open("data.csv") as tsvfile:
-    csvreader = csv.reader(tsvfile)# , delimiter="\t"
+    csvreader = csv.reader(tsvfile)  # , delimiter="\t"
     for line in csvreader:
-        # total["loadTime"], total["request"]
-        dataset.append([int(float(line[51])), int(float(line[53]))])
+        sum = float(line[3]) + float(line[4]) + float(line[5]) + float(line[6]) + float(line[7]) + float(
+            line[8]) + float(line[9]) + float(line[10]) + float(line[60])
+        dataset.append([int(float(line[51])), int(sum)])  # total["loadTime"], total object number
 time_object_figure(dataset)

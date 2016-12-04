@@ -13,7 +13,7 @@ def fraction(d, value):
     return count / len(d)
 
 
-def graph_1_rank(dataset):
+def graph_8_rank(dataset):
     x = [[], [], [], [], []]
     y = [[], [], [], [], []]
     rank_cat = ("1-400", "401-1k", "1001-2.5k", "5k-10k", "10001-20k")
@@ -43,14 +43,14 @@ def graph_1_rank(dataset):
         label.set_linewidth(3)  # the legend line width
 
     plt.figure(1)
-    plt.xlim(0, 450)
+    plt.xlim(0, 15)
     plt.yscale('linear')
-    plt.title('Num of objects by rank')
+    plt.title('Num of origin objects by rank')
     plt.grid(True)
     plt.show()
 
 
-def graph_1_category(dataset):
+def graph_8_category(dataset):
     x = [[], [], [], [], [], [], [], []]
     y = [[], [], [], [], [], [], [], []]
     categories = (
@@ -95,9 +95,9 @@ def graph_1_category(dataset):
         label.set_linewidth(3)  # the legend line width
 
     plt.figure(1)
-    plt.xlim(0, 450)
+    plt.xlim(0, 15)
     plt.yscale('linear')
-    plt.title('Num of objects by category')
+    plt.title('Num of origin objects by category')
     plt.grid(True)
     plt.show()
 
@@ -107,10 +107,13 @@ with open("data.csv") as tsvfile:
     csvreader = csv.reader(tsvfile)  # , delimiter="\t"
     for line in csvreader:
         sum = float(line[3]) + float(line[4]) + float(line[5]) + float(line[6]) + float(line[7]) + float(
-            line[8]) + float(line[9]) + float(line[10]) + float(line[60])
-        if sum > 500:
+            line[8]) + float(line[9]) + float(line[10]) + float(line[60]) - float(line[27]) - float(line[28]) - float(
+            line[29]) - float(line[30]) - float(line[31]) - float(line[32]) - float(line[33]) - float(line[34]) - float(
+            line[58])
+        if sum > 300:
             continue
         # category name, rank range, total object number
         dataset.append([line[2], int(float(line[1])), int(sum)])
-graph_1_rank(dataset)
-graph_1_category(dataset)
+
+graph_8_rank(dataset)
+graph_8_category(dataset)

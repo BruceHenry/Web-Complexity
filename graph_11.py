@@ -88,12 +88,12 @@ def graph_11_category(dataset):
         ax.plot(x[n], y[n], label=categories[n], color=color, linewidth=3.0)
         n += 1
 
-    legend = ax.legend(loc='lower right', shadow=True)
+    legend = ax.legend(loc='lower right')
     frame = legend.get_frame()
     frame.set_facecolor('0.90')
 
     for label in legend.get_texts():
-        label.set_fontsize('large')
+        label.set_fontsize('x-small')
 
     for label in legend.get_lines():
         label.set_linewidth(3)  # the legend line width
@@ -112,8 +112,8 @@ with open("data.csv") as tsvfile:
     csvreader = csv.reader(tsvfile)  # , delimiter="\t"
     for line in csvreader:
         # image, javascript, css, flash, xml, html, Json, video
-        dataset.append([float(line[3]), float(line[4]), float(line[5]), float(line[6]), float(line[7]), float(
-            line[8]), float(line[9]), float(line[10]), float(line[11]), float(line[12]), float(line[13]),
-                        float(line[14]), float(line[15]), float(line[16]), float(line[17]), float(line[18])])
-graph_11_rank(dataset)
+        dataset.append([float(line[27]), float(line[28]), float(line[29]), float(line[30]), float(line[31]), float(
+            line[32]), float(line[33]), float(line[34]), float(line[35]), float(line[36]), float(line[37]),
+                        float(line[38]), float(line[39]), float(line[40]), float(line[41]), float(line[42])])
+#graph_11_rank(dataset)
 graph_11_category(dataset)

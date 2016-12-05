@@ -68,6 +68,7 @@ with open("mapper.txt") as catfile:
 site = {}
 serverCache = {}
 rank_spread = {"1-400": {}, "400-1000": {}, "1000-2500": {}, "5000-10000": {}, "10000-20000": {}}
+image_type = {}
 for file in dirs:
     if pattern_har.match(file):
         file = path + file
@@ -76,7 +77,7 @@ for file in dirs:
                 data = json.loads(f.read().decode("utf-8-sig"))
             except:
                 continue
-        print(file)
+        #print(file)
 
         host = []
         ca = ""
@@ -93,7 +94,7 @@ for file in dirs:
         else:
             ca = categories[url]
 
-        print("Host Name:", host[0], "  Category:", ca, "  URL:", url)
+        #print("Host Name:", host[0], "  Category:", ca, "  URL:", url)
 
         nameServers = []
         if serverCache.get(host[0], 0) == 0:
@@ -105,7 +106,7 @@ for file in dirs:
         # print("serverCache", serverCache)
         for nameServer in serverCache[host[0]]:
             nameServers.append(str(nameServer)[:len(str(nameServer)) - 1])
-        print("nameServers:", nameServers)
+        #print("nameServers:", nameServers)
 
         originServerNumber = 1
         total = {"request": 0, "size": 0, "loadTime": 0}
@@ -165,6 +166,10 @@ for file in dirs:
 
             if (pattern_image.match(entry['response']['content']['mimeType']) and pattern_response.match(
                     str(entry['response']['status']))):
+                if entry['response']['content']['mimeType'] not in image_type:
+                    image_type[entry['response']['content']['mimeType']] = 1
+                else:
+                    image_type[entry['response']['content']['mimeType']] += 1
                 image["object"] += 1
                 image["size"] += entry['response']['content']['size']
                 image["loadTime"] += entry['time']
@@ -248,21 +253,21 @@ for file in dirs:
         if total["size"] == 0:
             continue
 
-        print("hostName:", get_host(host[0]), "rank:", rank_dict[host[0]])
-        print("Number of servers:", len(host))
-        print("originServerNumber:", originServerNumber)
-        print("non_origin_total:", non_origin_total)
-        print("servers:", host)
-        print('total:', total)
-        print('image:', image)
-        print('css:', css)
-        print('flash:', flash)
-        print('javascript:', javascript)
-        print('xml:', xml)
-        print('html:', html)
-        print('json:', Json)
-        print('video:', video)
-        print(i)
+        # print("hostName:", get_host(host[0]), "rank:", rank_dict[host[0]])
+        # print("Number of servers:", len(host))
+        # print("originServerNumber:", originServerNumber)
+        # print("non_origin_total:", non_origin_total)
+        # print("servers:", host)
+        # print('total:', total)
+        # print('image:', image)
+        # print('css:', css)
+        # print('flash:', flash)
+        # print('javascript:', javascript)
+        # print('xml:', xml)
+        # print('html:', html)
+        # print('json:', Json)
+        # print('video:', video)
+        # print(i)
         i += 1
 
         if rank <= 400:
@@ -325,7 +330,9 @@ for key, value in site.items():
         median = []
         for j in range(0, len(value)):
             median.append(value[j][i])
-        median_parameter.append(statistics.median(median))
+        #median_parameter.append(statistics.median(median))
+        median.sort()
+        median_parameter.append(median[int(0.9*len(median))])
     site[key] = median_parameter
 
 with open("sitespeed.csv") as tsvfile:
@@ -364,10 +371,10 @@ for key in site:
     row.append(find_rank_range(rank_dict[key]))
     row.append(categories["http://www." + key])
     row = row + site[key]
-    with open("data.csv", 'a', newline='') as f:
+    with open("90th_data.csv", 'a', newline='') as f:
         writer = csv.writer(f, dialect='excel')  # , delimiter="\t"
         writer.writerow(row)
-
+print(image_type)
 print(len(rank_spread["1-400"]), rank_spread["1-400"])
 print(len(rank_spread["400-1000"]), rank_spread["400-1000"])
 print(len(rank_spread["1000-2500"]), rank_spread["1000-2500"])

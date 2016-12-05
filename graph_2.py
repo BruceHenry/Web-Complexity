@@ -13,7 +13,7 @@ with open("data.csv") as tsvfile:
              int(float(line[11])), int(float(line[12])), int(float(line[13])), int(float(line[14])),
              int(float(line[52]))])
 
-print(dataset)
+#print(dataset)
 # keys stand for rank spreadd
 rank_spread = {1: {'image_object': [], 'javascript_object': [], 'css_object': [], 'flash_object': []},
                2: {'image_object': [], 'javascript_object': [], 'css_object': [], 'flash_object': []},
@@ -114,24 +114,28 @@ plt.show()
 
 # category to number of objects
 categories = (
-    "newsandmedia", "business", "shopping", "education", "entertainment", "sports", "travel", "informationtech",
-    "streamingmedia", "health", "adult", "other")
+    "newsandmedia", "business", "shopping", "education", "entertainment", "informationtech", "adult", "other")
 categories_name = (
-    "news & media", "business", "shopping", "education", "entertainment", "sports", "travel", "information & tech",
-    "streaming media", "health", "adult", "other")
+    "news & media", "business", "shopping", "education", "entertainment", "information & tech", "adult", "other")
 graph = ["image", "javascript", "CSS", "flash"]
 fig = plt.figure(figsize=(12, 12))
 plots = [221, 222, 223, 224]
 for j in range(0, 4):
-    x = [[], [], [], [], [], [], [], [], [], [], [], []]
+    x = [[], [], [], [], [], [], [], []]
     colors = []
     cmap = plt.get_cmap('jet')
     colors = cmap(np.linspace(0, 1.0, len(categories)))
     for site in dataset:
         ca = site[1]
         if ca not in categories:
-            ca = "other"
+            if ca in ['sports', "travel", "streamingmedia"]:
+                ca = "entertainment"
+            else:
+                ca = "other"
+            if site[len(site) - 1] == 0:
+                continue
         x[categories.index(ca)].append(site[2 + j])
+
 
     x_pos = np.arange(len(categories))
     median_objects = []
@@ -142,7 +146,7 @@ for j in range(0, 4):
         sub.set_ylim([0, 5])
     sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
     sub.set_xticks(x_pos)
-    sub.set_xticklabels(categories_name, rotation=85)
+    sub.set_xticklabels(categories_name, rotation=70)
     sub.set_ylabel('Median No. of Objects')
     sub.set_title(graph[j])
 fig.subplots_adjust(hspace=.5)
@@ -153,18 +157,22 @@ count = 0
 fig = plt.figure(figsize=(12, 12))
 plots = [221, 222, 223, 224]
 for j in range(0, 4):
-    x = [[], [], [], [], [], [], [], [], [], [], [], []]
+    x = [[], [], [], [], [], [], [], []]
     for site in dataset:
         ca = site[1]
         if ca not in categories:
-            ca = "other"
+            if ca in ['sports', "travel", "streamingmedia"]:
+                ca = "entertainment"
+            else:
+                ca = "other"
         if site[len(site) - 1] == 0:
             count += 1
             continue
-        x[categories.index(ca)].append(int(float(site[6 + j])) / site[len(site) - 1])
+        x[categories.index(ca)].append(int(float(site[6 + j])) / float(site[len(site) - 1]))
+        #print(ca)
     x_pos = np.arange(len(categories))
     median_objects = []
-    print(count)
+    print(x)
     for i in range(len(x)):
         median_objects.append(statistics.median(x[i]))
 
@@ -173,7 +181,7 @@ for j in range(0, 4):
         sub.set_ylim([0, 5])
     sub.bar(x_pos, median_objects, align='center', alpha=0.7, color=colors)
     sub.set_xticks(x_pos)
-    sub.set_xticklabels(categories_name, rotation=85)
+    sub.set_xticklabels(categories_name, rotation=70)
     sub.set_ylabel('Total % of byte downloaded')
     sub.set_title(graph[j])
 

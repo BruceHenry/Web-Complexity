@@ -1,9 +1,13 @@
 # Analysing Website Complexity
-•	Use Python to parse thousands of HAR (HTTP Archive) files.<br/>
+•	Use <b>Python</b> to parse thousands of HAR (HTTP Archive) files.<br/>
 •	Find common things among popular websites.<br/>
 •	Analyze what contributes most to the website performance.<br/>
 
-The "harparser.py" is the main file to do the data mining job.<br/><br/>
+# Instructions
+The <b>"harparser.py"</b> is the file to do the data mining job.<br/>
+Files of which the name contains "graph" are files to generate charts by <b>matplotlib.pyplot</b>.
+
+# Here are some example charts.
 
 Median Number of Requests for Objects of different MIME-types by Rank:
 <img src="/Images/figure2--1.png" alt="Sorry, unable to display" width="600" height="600" />
